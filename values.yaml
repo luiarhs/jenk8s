@@ -1,0 +1,43 @@
+controller:
+  persistence:
+    enabled: true
+    storageClass: "standard"
+    size: 8Gi
+  installPlugins:
+    - kubernetes:latest
+    - workflow-aggregator:latest
+    - configuration-as-code:latest
+    - git:latest
+    - github-branch-source:latest
+    - ssh-slaves:latest
+    - performance:latest
+    - dark-theme:latest
+  JCasC:
+    enabled: true
+    configScripts:
+      welcome-message: |
+        jenkins:
+          systemMessage: "Welcome to Jenkins!"
+      kubernetes-config: |
+        jenkins:
+          clouds:
+            - kubernetes:
+                name: "kubernetes"
+                serverUrl: "https://kubernetes.default.svc"
+                namespace: "default"
+                jenkinsUrl: "http://jenkins:8080"
+                podTemplates:
+                  - name: "jmeter-agent"
+                    containers:
+                      - name: "jmeter"
+                        image: "luiarhs/jmeter:latest"
+                        workingDir: "/home/jenkins/agent"
+    appearance:
+      themeManager:
+        disableUserThemes: true
+        theme: "dark"
+agent:
+  enabled: false # Disable default agents since we'll use Kubernetes pods
+rbac:
+  create: true
+  
